@@ -1,0 +1,14 @@
+# Expected output: python3 tools/verify_claims.py examples/example_wardrive_brief.txt examples/example_wardrive_analysis_qwen3-4b_FAILS.txt
+# (exit code 1 = VERIFY FAIL, reproduced below)
+
+[i] mode: wardrive
+[i] ground truth: {'sightings_total': 633, 'sightings_wifi': 545, 'sightings_ble': 88, 'unique_aps': 282, 'unique_ble': 82, 'hidden': 92, 'auth': {'WPA2_PSK': 445, 'OPEN': 34, 'WPA3_PSK': 30, 'WPA_WPA2_PSK': 24, 'WPA2_WPA3_PSK': 12}, 'ouis': {'2C:AB:46': 166, '68:F0:BC': 39, '24:F3:E3': 19, '6C:BF:2F': 15, '2C:2F:F4': 11, 'CC:1B:5A': 11, '74:37:5F': 10, 'D0:CB:DD': 10, '2C:67:BE': 9, 'B0:FC:88': 9}, 'run_durations_s': [815, 174], 'total_duration_s': 989}
+CONTRADICTION: unique AP count: model said 246, data says 282
+SUSPECT PERCENTAGE: hidden-SSID share: model said 14.5%, of WiFi sightings it is 16.9%
+CONTRADICTION: capture duration: model said 60s, actual run windows are [815, 174]s
+INVENTED EVIDENCE: frame subtype code 0x0004 cited; wardrive logs contain no frame-level data
+INVENTED EVIDENCE: frame subtype code 0x0004 cited; wardrive logs contain no frame-level data
+INVENTED EVIDENCE: frame-level claim about the data ('lack of probe request'); wardrive logs contain no frame-level data
+INVENTED EVIDENCE: frame-level claim about the data ('absence of any probe request'); wardrive logs contain no frame-level data
+
+[!] 7 claim(s) failed reconciliation

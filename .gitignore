@@ -1,0 +1,22 @@
+# Captures and run artifacts: raw PCAPs contain third-party MACs/SSIDs.
+# Never commit these. Publish sanitized examples only (see examples/).
+pipeline_runs/
+captures/
+*.pcap
+*.pcapng
+
+# Wardrive raw logs contain GPS coordinates.
+wardrive_*.log
+wardrive_poi_*.gpx
+
+# Local dashboards and logs may embed run details.
+dashboard.html
+*.log
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+Thumbs.db

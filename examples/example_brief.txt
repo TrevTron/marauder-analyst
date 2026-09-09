@@ -1,0 +1,22 @@
+CAPTURE BRIEF: /home/trevtron/marauder-analyst/captures/beacon_20260831-200333.pcap
+Frames: 702
+Frame mix: 0x0008=702
+Unique APs (by BSSID): 45
+  AP 74:37:5f:xx:xx:xx  SSID="third-party-01"
+  AP ca:c9:a3:xx:xx:xx  SSID="third-party-02"
+  AP 74:37:5f:xx:xx:xx  SSID="third-party-03"
+  AP 2c:67:be:xx:xx:xx  SSID="third-party-04"
+  AP f8:5b:3b:xx:xx:xx  SSID="third-party-05"
+  AP f0:7b:65:xx:xx:xx  SSID="third-party-06"
+  AP f8:5b:3b:xx:xx:xx  SSID="third-party-07"
+  AP 6e:7b:1e:xx:xx:xx  SSID="<MISSING>"
+  AP f0:81:75:xx:xx:xx  SSID="third-party-08"
+  AP 34:53:d2:xx:xx:xx  SSID="third-party-09"
+  AP 1e:30:08:xx:xx:xx  SSID="<MISSING>"
+  AP 68:ff:7b:xx:xx:xx  SSID="third-party-10"
+  AP 2a:94:01:xx:xx:xx  SSID="third-party-11"
+  AP b0:1f:f4:xx:xx:xx  SSID="third-party-12"
+  AP 74:93:da:xx:xx:xx  SSID="third-party-13"
+Top talkers (by frames): 2c:67:be:xx:xx:xx(60), 64:18:df:xx:xx:xx(53), 74:37:5f:xx:xx:xx(41), b0:1f:f4:xx:xx:xx(36), 74:37:5f:xx:xx:xx(36), f8:5b:3b:xx:xx:xx(33), 74:93:da:xx:xx:xx(29), ca:c9:a3:xx:xx:xx(28), 68:ff:7b:xx:xx:xx(25), f0:81:75:xx:xx:xx(24), f8:5b:3b:xx:xx:xx(23), 34:53:d2:xx:xx:xx(23), f8:3e:b0:xx:xx:xx(21), f0:7b:65:xx:xx:xx(20), 88:de:7c:xx:xx:xx(18)
+Devices sending probe requests: 0
+Deauth/disassoc frames: 0

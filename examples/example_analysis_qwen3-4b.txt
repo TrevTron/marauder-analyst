@@ -1,0 +1,8 @@
+**(1) Environment Summary:**  
+The 60-second passive capture shows a dense, residential Wi-Fi environment with 45 unique access points (APs), all broadcasting SSIDs primarily in one ISP's anonymized setup-SSID series (names withheld per publication rules). All frames are beacons (0x0008), indicating no active client probe requests, probe responses, or data traffic—suggesting a static, low-activity environment where devices are likely already connected or have not initiated discovery. Most APs are from known vendors (e.g., Tineco, Netgear), with several sharing similar SSID naming patterns, implying a mass-deployed, standardized setup common in apartment complexes. No deauth or disassociation events suggest no active disconnections or client-driven disruptions.
+
+**(2) Anomalies and Why:**  
+- **All frames are beacons (0x0008)**: This indicates no client traffic (no probe requests, data, or action frames), which is unusual for a residential environment where devices typically probe for networks. The absence of probe requests (0 devices) and data frames suggests either: (a) clients are already connected and not actively scanning, or (b) the capture is incomplete or occurs during a period of low device activity. This could also imply a passive, non-interactive environment, possibly due to a locked-down or controlled network.  
+- **45 unique APs with only 
+---
+model=qwen3:4b-instruct eval_tokens=300 eval_s=305.1 total_s=662.6

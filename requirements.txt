@@ -1,0 +1,7 @@
+# Python dependencies (pip install -r requirements.txt)
+pyserial==3.5
+matplotlib>=3.8
+
+# System dependencies (install via your package manager, not pip):
+#   tshark   - Wireshark CLI, used by tools/summarize_pcap.py
+#   ollama   - local model runtime, used by tools/analyze_brief.py
