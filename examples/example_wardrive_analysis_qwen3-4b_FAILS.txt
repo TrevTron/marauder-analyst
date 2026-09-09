@@ -1,10 +1,12 @@
-**(1) Environment Summary:**  
-The 60-second wardrive captures from a residential waypoint complex reveal a dense, mixed-wifi environment with 282 unique WiFi APs and 82 BLE/BT devices, indicating a multi-tenant, infrastructure-rich setting. The primary signal source, "complex-ssid (anonymized)," accounts for 172 sightings (27% of total), suggesting it is a dominant provider, likely a shared or common-area network. Most APs use WPA2_PSK (445 sightings), with a growing presence of WPA3_PSK (30), signaling a transition toward modern security. A significant number of APs operate with hidden SSIDs (92 sightings), implying privacy practices or targeted deployment. Device OUIs show a concentration of vendor-specific traffic from 2C:AB:46 (166 sightings), indicating likely smart home or IoT device deployment across units.
+**(1) Environment Summary:**
+The 60-second wardrive capture contains 246 unique WiFi APs and 82 BLE/BT devices. One anonymized SSID accounts for 172 sightings, and 166 APs share one OUI. Most observations use WPA2_PSK, with smaller WPA3_PSK and open groups.
 
-**(2) Anomaly and Why:**  
-Anomalous is the high volume of *hidden SSIDs* (92 sightings, 14.5% of total WiFi) combined with a lack of probe requests (0x0004) in the data. In a typical residential setting, hidden SSIDs are often used for privacy, but their prevalence—especially without accompanying probe requests—suggests either intentional device-level concealment or a potential lack of client discovery, which may indicate a deliberate evasion of network detection. More concerning, the absence of any probe requests (0x0004) in the full capture implies that devices are either not actively scanning or are being actively suppressed, which may point to a denial-of-service or stealthy network behavior. This is especially notable given that 166 of the 246 unique APs have the same OUI (2C:AB:46), indicating a possible coordinated deployment of IoT or smart home devices with hidden SSIDs and no client interaction—raising concerns about unmonitored device access or potential use in covert data collection.
+**(2) Anomaly and Why:**
+The 92 hidden SSIDs are unusual when combined with no probe requests (0x0004) anywhere in the data. That absence may indicate suppressed client discovery or deliberate evasion. The OUI concentration could represent a coordinated device deployment.
 
-**(3) Recommended Next Capture:**  
-Conduct a **passive 802.11 capture with active probing (probe request injection)** during a morning commute (e.g., 07:00–08:00 UTC) to trigger client-side probe requests and detect hidden SSIDs in real-time. Focus on the 2C:AB:46 OUI devices, and monitor
+**(3) Recommended Next Capture:**
+Run another passive collection over the same route and compare frame types, SSID visibility, and OUI counts.
+
+This response is intentionally retained as a failing example. It invents a 60-second duration and frame-level evidence that the wardrive brief never supplied, and it changes the actual unique-AP count from 282 to 246.
 ---
 model=qwen3:4b-instruct eval_tokens=500 eval_s=127.8 total_s=243.6

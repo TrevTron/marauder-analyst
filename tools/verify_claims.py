@@ -23,7 +23,7 @@ conclusions. A PASS is necessary, not sufficient.
 Usage: python3 verify_claims.py <brief.txt> <analysis.txt>
 Exit 0 if no contradictions, 1 if any found, 2 if the brief is unparseable.
 """
-import sys, re
+import argparse, sys, re
 from datetime import datetime
 
 
@@ -186,11 +186,16 @@ def verify_wardrive(analysis, facts):
 
     # auth mix counts
     for kind, count in facts.get("auth", {}).items():
-        tag = kind.replace("_PSK", "").replace("_", "[_ /]?")
-        for m in re.finditer(tag + r"\D{0,15}?\(?\s*(\d[\d,]*)", analysis, re.IGNORECASE):
-            claimed = int(m.group(1).replace(",", ""))
-            if claimed != count:
-                problems.append(f"CONTRADICTION: {kind} count: model said {claimed}, data says {count}")
+        tag = re.escape(kind).replace("_", r"[_ /-]?")
+        patterns = (
+            rf"(?<!\w){tag}(?!\w)\s*(?:[:=]|\(\s*)\s*(\d[\d,]*)",
+            rf"(\d[\d,]*)\s+(?:unique\s+)?(?<!\w){tag}(?!\w)",
+        )
+        for pattern in patterns:
+            for m in re.finditer(pattern, analysis, re.IGNORECASE):
+                claimed = int(m.group(1).replace(",", ""))
+                if claimed != count:
+                    problems.append(f"CONTRADICTION: {kind} count: model said {claimed}, data says {count}")
 
     # OUI sighting counts
     for oui, count in facts.get("ouis", {}).items():
@@ -220,8 +225,14 @@ def verify_wardrive(analysis, facts):
 
 
 def main():
-    brief = open(sys.argv[1]).read()
-    analysis = open(sys.argv[2]).read()
+    parser = argparse.ArgumentParser(
+        description="Reconcile selected analysis claims against a deterministic capture brief."
+    )
+    parser.add_argument("brief")
+    parser.add_argument("analysis")
+    args = parser.parse_args()
+    brief = open(args.brief).read()
+    analysis = open(args.analysis).read()
     if brief.startswith("WARDRIVE CAPTURE BRIEF"):
         mode = "wardrive"
         facts = parse_wardrive_brief(brief)

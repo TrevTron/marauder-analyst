@@ -9,6 +9,8 @@ Runs the verifier against:
   3. the shipped wardrive FAIL pair (must FAIL with the documented catches)
   4. a truthful analysis of the adversarial brief (must PASS, guarding
      against over-flagging)
+  5. natural auth-mode prose that contains no numerical auth claim (must PASS)
+  6. an explicit wrong auth-mode count (must FAIL)
 
 Usage: python3 tools/test_verify_claims.py
 Exit 0 if all tests pass, 1 otherwise.
@@ -69,6 +71,13 @@ WARDRIVE_FAIL_EXPECTED = [
     "INVENTED EVIDENCE",
     "capture duration",
 ]
+
+WARDRIVE_AUTH_PROSE = """\
+The brief reports 282 unique APs and 82 BLE devices. Most observations use
+WPA2_PSK, with smaller WPA3_PSK and open groups. It contains 92 hidden SSIDs.
+"""
+
+WARDRIVE_AUTH_ATTACK = "The auth mix includes OPEN: 2."
 
 
 def run_verifier(brief_path, analysis_path):
@@ -133,6 +142,30 @@ def main():
     all_ok &= check("shipped wardrive FAIL pair exits 1", code == 1, f"exit {code}\n{out}")
     for expected in WARDRIVE_FAIL_EXPECTED:
         all_ok &= check(f"wardrive catch: {expected}", expected in out)
+
+    # 5. digits inside WPA2/WPA3 labels must not become invented auth counts
+    with tempfile.TemporaryDirectory() as tmp:
+        auth_prose = os.path.join(tmp, "wardrive_auth_prose.txt")
+        with open(auth_prose, "w", encoding="utf-8") as fh:
+            fh.write(WARDRIVE_AUTH_PROSE)
+        code, out = run_verifier(
+            os.path.join(REPO, "examples", "example_wardrive_brief.txt"),
+            auth_prose,
+        )
+        all_ok &= check("wardrive auth prose exits 0", code == 0, f"exit {code}\n{out}")
+
+        auth_attack = os.path.join(tmp, "wardrive_auth_attack.txt")
+        with open(auth_attack, "w", encoding="utf-8") as fh:
+            fh.write(WARDRIVE_AUTH_ATTACK)
+        code, out = run_verifier(
+            os.path.join(REPO, "examples", "example_wardrive_brief.txt"),
+            auth_attack,
+        )
+        all_ok &= check("wardrive auth attack exits 1", code == 1, f"exit {code}\n{out}")
+        all_ok &= check(
+            "wardrive auth catch: OPEN count",
+            "OPEN count: model said 2, data says 34" in out,
+        )
 
     print("\n" + ("ALL TESTS PASS" if all_ok else "TESTS FAILED"))
     return 0 if all_ok else 1

@@ -15,16 +15,33 @@ Notes from 2026-08-31 bench session:
 - sniffraw floods serial with live stats and starves the parser; stopscan may not
   land. Mitigation: send stopscan repeatedly with gaps, watch for stats to halt.
 """
-import sys, time, serial
+import os, sys, time
 
 PORT = "/dev/ttyUSB0"
 BAUD = 115200
 
 def open_port():
+    try:
+        import serial
+    except ModuleNotFoundError as exc:
+        raise SystemExit(
+            "pyserial is required for Marauder serial access. "
+            "Install it with: pip install -r requirements.txt"
+        ) from exc
     ser = serial.Serial(PORT, BAUD, timeout=0.2)
     ser.reset_input_buffer()
     ser.reset_output_buffer()
     return ser
+
+
+def parse_seconds(value):
+    try:
+        seconds = int(value)
+    except ValueError as exc:
+        raise SystemExit("seconds must be a positive integer") from exc
+    if seconds <= 0:
+        raise SystemExit("seconds must be a positive integer")
+    return seconds
 
 def drain(ser, seconds=1.0):
     """Read whatever comes for N seconds, return decoded text."""
@@ -74,12 +91,13 @@ def sniff(ser, kind, seconds):
     print(f"[+] new files: {new if new else 'NONE - check device'}")
     return new
 
-def stream(ser, kind, seconds, outdir="/home/trevtron/marauder-analyst/captures"):
+def stream(ser, kind, seconds, outdir=None):
     """Run a sniff with -serial, reassemble BUF segments, save timestamped PCAP."""
-    import re, os, datetime
+    import re, datetime
     start_cmds = {"beacon": "sniffbeacon", "probe": "sniffprobe", "raw": "sniffraw", "pmkid": "sniffpmkid -d", "pmkidt": "sniffpmkid -d -l"}
     if kind not in start_cmds:
         raise SystemExit(f"unknown sniff kind: {kind}")
+    outdir = outdir or os.path.expanduser("~/marauder-analyst/captures")
     os.makedirs(outdir, exist_ok=True)
     ser.reset_input_buffer()
     ser.write(start_cmds[kind].encode() + b" -serial\r\n")
@@ -109,10 +127,17 @@ def stream(ser, kind, seconds, outdir="/home/trevtron/marauder-analyst/captures"
     return path
 
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2 or sys.argv[1] in {"-h", "--help"}:
         print(__doc__)
         return
     action = sys.argv[1]
+    if action == "cmd" and len(sys.argv) < 3:
+        raise SystemExit('usage: python3 marauder.py cmd "<marauder command>"')
+    if action in {"sniff", "stream"} and len(sys.argv) < 3:
+        raise SystemExit(f"usage: python3 marauder.py {action} <beacon|probe|raw|pmkid|pmkidt> [seconds]")
+    if action not in {"cmd", "ls", "sniff", "stream", "stop"}:
+        raise SystemExit(f"unknown action: {action}\n\n{__doc__}")
+    seconds = parse_seconds(sys.argv[3]) if action in {"sniff", "stream"} and len(sys.argv) > 3 else 60
     with open_port() as ser:
         drain(ser, 0.5)
         if action == "cmd":
@@ -121,9 +146,9 @@ def main():
             for name, size in ls_root(ser).items():
                 print(f"{name}\t{size}")
         elif action == "sniff":
-            sniff(ser, sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 60)
+            sniff(ser, sys.argv[2], seconds)
         elif action == "stream":
-            stream(ser, sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 60)
+            stream(ser, sys.argv[2], seconds)
         elif action == "stop":
             for attempt in range(15):
                 out = cmd(ser, "stopscan", wait=2.0)
@@ -132,8 +157,6 @@ def main():
                     return
                 time.sleep(1)
             print("[!] no acknowledgment; tap the screen")
-        else:
-            print(__doc__)
 
 if __name__ == "__main__":
     main()

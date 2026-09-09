@@ -1,11 +1,11 @@
 WARDRIVE CAPTURE BRIEF (sanitized, no coordinates)
 
 Files: wardrive_0.log, wardrive_1.log
-Runs: 2 (run_0 = outbound outbound, run_1 = return walk)
+Runs: 2 (run_0 = outbound, run_1 = return)
 Total sightings: 633 (545 WiFi, 88 BLE/BT)
 Unique devices: 282 WiFi APs, 82 BLE/BT
 POI bookmarks: [2, 2] per run (waypoint A, waypoint B)
-Home-to-waypoint straight line: ~100 m
+Waypoint A-to-B straight line: ~100 m
 
 [run_0] 2026-09-02 00:22:39 to 2026-09-02 00:36:14 UTC
   sightings 383 (323 WiFi / 60 BLE), unique APs 246, unique BLE 56, path ~446 m
@@ -23,12 +23,11 @@ Combined auth mix (unique-device sightings):
   WPA2_WPA3_PSK: 12
 
 Top SSIDs by sightings (third-party names anonymized):
-  complex-ssid (anonymized): 172
+  third-party-01: 172
   (hidden): 92
-  third-party-01: 8
-  third-party-02: 5
+  third-party-02: 8
   third-party-03: 5
-  third-party-04: 4
+  third-party-04: 5
   third-party-05: 4
   third-party-06: 4
   third-party-07: 4
@@ -38,6 +37,7 @@ Top SSIDs by sightings (third-party names anonymized):
   third-party-11: 4
   third-party-12: 4
   third-party-13: 4
+  third-party-14: 4
 
 Top device OUIs (first 3 bytes only):
   2C:AB:46: 166

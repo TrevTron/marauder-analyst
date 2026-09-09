@@ -7,18 +7,21 @@ projects. These are the ones that actually shaped decisions.
 
 - **LLMcap** (B-Yond, 2024, arXiv:2407.06085): DistilBERT learns the grammar of
   normal PCAPs via masked-token reconstruction and flags failures by
-  reconstruction error. Inference ~10 s per PCAP on a 4-core/16 GB machine.
-  Lesson taken: learn grammar, not magic; performance collapses off-domain.
+  reconstruction error. The paper reports 9.5 to 10 seconds per PCAP for its
+  packet-ordered dictionary variants in an AWS G5.xlarge test environment.
+  Lesson taken: learn grammar, not magic; generalization dropped sharply on a
+  dissimilar external service.
 - **PLUME** (Cisco, 2026, arXiv:2603.13647): a 140M-parameter protocol-aware
-  model matched frontier models on wireless-trace prediction. Lesson taken:
-  small, protocol-aware, local beats giant and general on narrow tasks. Also:
-  pin your tshark version.
+  model matched frontier models on the paper's wireless-trace prediction
+  tasks. Lesson taken: purpose-built representations can let compact models
+  compete on a narrow evaluated task. This is not a general model-size claim.
+  Also: pin your tshark version.
 - **PROBE** (Cisco, 2026, arXiv:2606.06871): single-pass LLM beat a human expert
   baseline on capture verdicts but missed critical frames in 35% of cases.
   Naive majority-vote ensembling made results worse; a reconciliation step that
-  checks every claim against the actual packets reached 0.957 weighted F1 with
+  evaluates candidate diagnoses against packet evidence reached 0.957 weighted F1 with
   96% auto-accept. Their documented failure modes (invented frames, run-to-run
-  flip-flopping, right observation wrong conclusion) are our acceptance tests.
+  flip-flopping, right observation wrong conclusion) informed our acceptance tests.
   Their capture representation (500 to 5,000 tokens) sized our brief format.
 - **Abkenar (2025, arXiv:2506.06943)**: I/Q signal classification (RadioML
   2018.01A), not PCAP analysis. We keep its 802.11 pathology taxonomy

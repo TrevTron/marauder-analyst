@@ -1,4 +1,4 @@
-CAPTURE BRIEF: /home/trevtron/marauder-analyst/captures/beacon_20260831-200333.pcap
+CAPTURE BRIEF: /home/analyst/marauder-analyst/captures/beacon_example.pcap
 Frames: 702
 Frame mix: 0x0008=702
 Unique APs (by BSSID): 45

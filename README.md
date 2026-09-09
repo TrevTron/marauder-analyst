@@ -2,10 +2,10 @@
 
 Turn an ESP32 Marauder into an automated WiFi capture analyst. A Marauder captures
 802.11 traffic; a small single-board computer (we use a Youyeetoo X1S, N5095, 16 GB,
-no discrete GPU, all inference CPU-only) pulls the capture over a USB serial link,
-reduces it to a compact deterministic brief, and hands that brief to a small local
-language model that writes the analysis. No cloud, no API keys, no WiFi chipset on
-the analyst host.
+no discrete GPU, all inference CPU-only) receives the capture over the stock USB
+serial path or the optional WiFi offload path, reduces it to a compact deterministic
+brief, and hands that brief to a small local language model that writes the analysis.
+No cloud, no API keys, and no monitor-mode WiFi adapter on the analyst host.
 
 Built on a JustCallMeKoko Marauder v6.1 running stock firmware (built and tested on
 v1.15.1; v1.16.0 shipped 2026-09-08 and has not been tested with this project).
@@ -21,7 +21,8 @@ URL. Fine for your own bench, nothing more.
 - `tools/marauder.py` - serial CLI controller. Run sniffs, list the SD card, stop
   scans, and stream live PCAPs over USB using the stock firmware's `-serial` flag.
 - `tools/summarize_pcap.py` - deterministic PCAP-to-brief summarizer (tshark).
-  Produces a ~1-2 KB text brief: frame mix, AP census, top talkers, probe
+  Produces a brief ranging from a few hundred bytes to about 2 KB in the
+  measured runs: frame mix, AP census, top talkers, probe
   behavior, deauth sources, EAPOL/handshake counts. No LLM involved.
 - `tools/analyze_brief.py` - sends a brief to a local Ollama model and records
   the response plus timing.
@@ -40,7 +41,7 @@ URL. Fine for your own bench, nothing more.
   summarize it, analyze it, save all artifacts to a timestamped run folder
   (default: ~/marauder-analyst/pipeline_runs, outside the repo tree).
 - `docs/EVIDENCE_LEDGER.md` - the sanitized extract of the project's private
-  capture log: every number in the article traced to a log entry, with
+  capture log: the article's run-specific measurements traced to log entries, with
   third-party identifiers removed. The raw log stays private on purpose.
 
 ## Quick start
@@ -58,15 +59,19 @@ python3 tools/marauder.py stream raw 60     # 60s capture streamed live to disk
 python3 tools/pipeline.py raw 60 qwen3:4b-instruct 400   # capture -> brief -> analysis
 ```
 
+Each command supports `--help`. The pipeline stores raw run artifacts outside the
+repository by default. The serial and end-to-end commands require the Marauder;
+the summarizer, verifier, examples, and regression tests can be used without it.
+
 ## Examples
 
 `examples/` contains a real pcap brief and its (passing) analysis, plus a wardrive
-brief whose qwen3:4b analysis FAILS verification in seven places: wrong counts,
+brief whose qwen3:4b analysis FAILS verification in three places: a wrong count,
 invented frame-level evidence, hallucinated durations. Reproduce with:
 
 ```bash
 python3 tools/verify_claims.py examples/example_wardrive_brief.txt \
-  examples/example_wardrive_analysis_qwen3-4b_FAILS.txt   # exits 1, 7 catches
+  examples/example_wardrive_analysis_qwen3-4b_FAILS.txt   # exits 1, 3 catches
 ```
 
 The failing example is the point: small local models invent plausible detail, and
@@ -85,7 +90,7 @@ Regression suite for the verifier: the adversarial case from an external
 pre-publication review (small-magnitude frame totals, invented EAPOL and
 handshake counts, an unsupported "crackable" verdict), the shipped passing
 example, the shipped wardrive FAIL example, and a truthful-analysis guard
-against over-flagging. 14 checks, exit 0 on success.
+against over-flagging. 19 checks, exit 0 on success.
 
 ## What we measured (2026-08-31 to 2026-09-02, hardware as above)
 
@@ -93,13 +98,14 @@ against over-flagging. 14 checks, exit 0 on success.
   streamed PCAP and the SD-card copy of the same 60s capture were identical
   (sha256 match, 1,718 frames each, zero observed UART loss at ~29 fps).
   The real ceiling is bandwidth math: 115200 baud is ~11.5 KB/s theoretical,
-  so airspace louder than that will overflow the serial link. SD-card capture
-  remains the full-fidelity option there.
-- qwen3.5:0.8b analyzed a capture brief at ~7.4 tok/s and hallucinated (wrong
-  deauth counts, invented topology). qwen3:4b-instruct at ~1.3 tok/s got every
-  number right. Two models from two different Qwen generations is not a
-  controlled size ladder, so treat "4B is the floor" as a rule of thumb from
-  these runs, not a measured threshold.
+  so a capture stream that exceeds that ceiling will overflow the serial link.
+  SD-card capture is the safer option as measured throughput approaches it.
+- qwen3.5:0.8b analyzed a raw-capture brief at ~7.4 tok/s and hallucinated
+  (wrong deauth counts, invented topology). On the same brief,
+  qwen3:4b-instruct ran at ~1 tok/s and correctly reported the measured counts.
+  A later attack brief ran at ~1.3 tok/s. These are two models from different Qwen
+  generations, not a controlled size ladder and not evidence of a general
+  parameter threshold.
 - This specific 64 GB FAT32 SD card wrote valid PCAPs on v1.15.1 throughout
   testing, despite the wiki's documented 32 GB guidance. One card, one
   firmware version: an existence proof, not a refutation of the limit.

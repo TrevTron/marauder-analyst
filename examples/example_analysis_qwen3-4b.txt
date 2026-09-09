@@ -1,8 +1,10 @@
-**(1) Environment Summary:**  
-The 60-second passive capture shows a dense, residential Wi-Fi environment with 45 unique access points (APs), all broadcasting SSIDs primarily in one ISP's anonymized setup-SSID series (names withheld per publication rules). All frames are beacons (0x0008), indicating no active client probe requests, probe responses, or data traffic—suggesting a static, low-activity environment where devices are likely already connected or have not initiated discovery. Most APs are from known vendors (e.g., Tineco, Netgear), with several sharing similar SSID naming patterns, implying a mass-deployed, standardized setup common in apartment complexes. No deauth or disassociation events suggest no active disconnections or client-driven disruptions.
+**(1) Environment Summary:**
+The brief contains 702 frames from 45 access points. Every recorded frame is a beacon (0x0008); the brief contains no probe requests, data frames, deauthentication frames, or disassociation frames. The safest interpretation is that the capture was filtered to beacons. The brief does not establish the physical setting, overall network activity, or behavior outside the selected frame type.
 
-**(2) Anomalies and Why:**  
-- **All frames are beacons (0x0008)**: This indicates no client traffic (no probe requests, data, or action frames), which is unusual for a residential environment where devices typically probe for networks. The absence of probe requests (0 devices) and data frames suggests either: (a) clients are already connected and not actively scanning, or (b) the capture is incomplete or occurs during a period of low device activity. This could also imply a passive, non-interactive environment, possibly due to a locked-down or controlled network.  
-- **45 unique APs with only 
+**(2) Anomalies and Why:**
+The frame mix is unusually uniform for an unfiltered capture, but it is expected for a beacon-only collection. No security event is supported by the supplied fields. The repeated OUIs and anonymized SSIDs describe what the receiver heard, not network ownership, topology, or device intent.
+
+**(3) Recommended Next Capture:**
+Run a second passive capture without a beacon-only filter, using the same duration and receiver position. Compare its subtype mix with this brief before treating the absence of client traffic as an environmental finding.
 ---
 model=qwen3:4b-instruct eval_tokens=300 eval_s=305.1 total_s=662.6

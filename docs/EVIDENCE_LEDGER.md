@@ -1,10 +1,11 @@
 # Evidence ledger (sanitized)
 
-This is the publication-safe extract of the project's private capture log
-(58 timestamped entries plus #37b, 2026-08-31 to 2026-09-09). The raw log
+This is a publication-safe extract through private log entry #58, plus #37b,
+covering 2026-08-31 to 2026-09-09. Later private entries document release
+preparation rather than new capture findings. The raw log
 stays private under PUBLICATION_RULES.md: it contains third-party MACs and
 SSIDs, location data, and lab network details. What follows is the evidence
-chain behind every number in the article, with those identifiers removed.
+chain for the article's core run-specific measurements, with those identifiers removed.
 Entry numbers match the private log so the chain is auditable in principle;
 the raw entries themselves are not published.
 
@@ -53,7 +54,7 @@ waypoints are A and B.
 ## The day-one anomaly
 
 - #8: the 83-deauth observation itself (above).
-- #45: 45-minute follow-up pattern sniff. The day-one source never
+- #45: follow-up pattern sniff. The day-one source never
   reappeared. What dominated: unicast deauths from one radio to a single
   client, reason code 15 (4-way handshake timeout) in 250 of 268 frames,
   mean interval ~17 s in clusters, one 27-min quiet gap. Consistent with a
