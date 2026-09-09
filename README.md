@@ -7,6 +7,9 @@ serial path or the optional WiFi offload path, reduces it to a compact determini
 brief, and hands that brief to a small local language model that writes the analysis.
 No cloud, no API keys, and no monitor-mode WiFi adapter on the analyst host.
 
+The full build story, including the failed runs and the limits of the checker,
+is at [unland.dev](https://unland.dev/blog/esp32-marauder-local-llm-capture-analyst).
+
 Built on a JustCallMeKoko Marauder v6.1 running stock firmware (built and tested on
 v1.15.1; v1.16.0 shipped 2026-09-08 and has not been tested with this project).
 The USB serial path works with official firmware; no fork or custom build required.
