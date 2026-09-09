@@ -58,6 +58,12 @@ sent probe requests. There were 8 deauth events. The sniffer saw 8 EAPOL frames:
 M1 4 times, M2 4 times, M3 0 times. That is partial material, not enough to crack.
 """
 
+# Colon-first total-frame phrasing slipped every gate until the 2026-09-09
+# adversarial probe; locked in as a regression.
+COLON_ATTACK_ANALYSIS = """\
+Frames: 701 were recorded. The capture shows 3 unique access points.
+"""
+
 WARDRIVE_FAIL_EXPECTED = [
     "unique AP count: model said 246, data says 282",
     "INVENTED EVIDENCE",
@@ -100,6 +106,17 @@ def main():
         # 4. truthful analysis of the same brief must PASS
         code, out = run_verifier(adv_brief, ok_analysis)
         all_ok &= check("truthful analysis exits 0", code == 0, f"exit {code}\n{out}")
+
+        # 5. colon-first total-frame phrasing must FAIL (2026-09-09 probe)
+        colon_analysis = os.path.join(tmp, "colon_analysis.txt")
+        with open(colon_analysis, "w", encoding="utf-8") as fh:
+            fh.write(COLON_ATTACK_ANALYSIS)
+        code, out = run_verifier(adv_brief, colon_analysis)
+        all_ok &= check("colon-first attack exits 1", code == 1, f"exit {code}\n{out}")
+        all_ok &= check(
+            "colon-first catch: total frame count",
+            "total frame count: model said 701, data says 702" in out,
+        )
 
     # 2. shipped passing example pair must PASS
     code, out = run_verifier(

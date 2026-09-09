@@ -97,6 +97,9 @@ FRAME_TOTAL_PATTERNS = [
     r"total\s*of\s*(\d[\d,]*)\s*frames",
     r"(\d[\d,]*)\s*frames\s+(?:in|across|over)\s+the\s+(?:capture|pcap|brief|file)",
     r"(?:capture|pcap|file)\s+(?:contains|contained|holds|held|has|had)\s*(\d[\d,]*)\s*frames",
+    # colon-first phrasing ("Frames: 701 were recorded"); found by adversarial
+    # probe 2026-09-09, previously slipped every gate
+    r"frames:\s*(\d[\d,]*)",
 ]
 
 
@@ -116,7 +119,9 @@ def verify_pcap(brief, analysis, facts):
             for m in re.finditer(pattern, analysis, re.IGNORECASE):
                 claimed = int(m.group(1).replace(",", ""))
                 if claimed != facts["frames"]:
-                    problems.append(f"CONTRADICTION: total frame count: model said {claimed}, data says {facts['frames']}")
+                    msg = f"CONTRADICTION: total frame count: model said {claimed}, data says {facts['frames']}"
+                    if msg not in problems:
+                        problems.append(msg)
 
     # EAPOL / handshake checks (brief carries these when the capture has them)
     if "eapol" in facts:
