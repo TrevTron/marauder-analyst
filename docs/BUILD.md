@@ -1,5 +1,11 @@
 # Building Marauder + FileServe from source (v6.1, verified 2026-08-31)
 
+Base: justcallmekoko/ESP32Marauder tag **v1.15.1**, commit
+`91724fd8e964cb6f55cd7da60a3320570919de5b`. Clone with
+`git clone --recurse-submodules -b v1.15.1 https://github.com/justcallmekoko/ESP32Marauder.git`.
+(v1.16.0 shipped 2026-09-08, after this recipe was verified; it has NOT been
+tested with this module.)
+
 The wiki's build page is stale for the current master tree. The authoritative
 recipe is the CI matrix in `.github/workflows/build_parallel.yml`. This is the
 exact setup that produced a working flash on real v6.1 hardware.
@@ -78,3 +84,20 @@ arduino-cli upload --fqbn esp32:esp32:d32:PartitionScheme=min_spiffs \
   starts AP `MarauderFiles` with HTTP on `192.168.4.1:8080`
   (`/health`, `/list`, `/get?file=...`). `filesrv` or `stopscan` stops it.
 - Post-flash regression: scanall, list -a, CLI all normal.
+
+## FileServe security: lab-grade, read this before relying on it
+
+FileServe is an experimental owned-lab module, not a security boundary:
+
+- Running `filesrv` without `-k` starts the server with NO key check at all
+  (empty key means open access to anyone on the AP).
+- The AP password is hardcoded (`marauderfiles`) in CommandLine.cpp. Anyone who
+  reads this repo can join the AP. Change it for your own build.
+- The key travels as a URL query parameter (`?key=...`), so it appears in
+  serial logs and any HTTP intermediary. Treat it as a casual access token,
+  not a credential.
+- `/list` returns file SIZES, not hashes. "Matches the listing" proves size
+  only. If you need integrity, hash the pulled file yourself and compare
+  against a hash taken over serial or from a second pull.
+
+For a bench in your own lab this is fine. Do not expose it beyond that.

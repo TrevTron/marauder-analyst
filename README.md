@@ -2,15 +2,19 @@
 
 Turn an ESP32 Marauder into an automated WiFi capture analyst. A Marauder captures
 802.11 traffic; a small single-board computer (we use a Youyeetoo X1S, N5095, 16 GB,
-no GPU) pulls the capture over a USB serial link, reduces it to a compact
-deterministic brief, and hands that brief to a small local language model that
-writes the analysis. No cloud, no API keys, no WiFi chipset on the analyst host.
+no discrete GPU, all inference CPU-only) pulls the capture over a USB serial link,
+reduces it to a compact deterministic brief, and hands that brief to a small local
+language model that writes the analysis. No cloud, no API keys, no WiFi chipset on
+the analyst host.
 
-Built on a JustCallMeKoko Marauder v6.1 running stock firmware (tested on v1.15.1).
+Built on a JustCallMeKoko Marauder v6.1 running stock firmware (built and tested on
+v1.15.1; v1.16.0 shipped 2026-09-08 and has not been tested with this project).
 The USB serial path works with official firmware; no fork or custom build required.
 An optional WiFi offload path (captures served straight off the SD card over HTTP,
 so the card never leaves the device) uses a small custom FileServe module; see
-docs/BUILD.md.
+docs/BUILD.md. FileServe is lab-grade access control, not a security boundary:
+the token is optional, the AP password is hardcoded, and the token rides in the
+URL. Fine for your own bench, nothing more.
 
 ## What this is
 
@@ -18,18 +22,23 @@ docs/BUILD.md.
   scans, and stream live PCAPs over USB using the stock firmware's `-serial` flag.
 - `tools/summarize_pcap.py` - deterministic PCAP-to-brief summarizer (tshark).
   Produces a ~1-2 KB text brief: frame mix, AP census, top talkers, probe
-  behavior, deauth sources. No LLM involved.
+  behavior, deauth sources, EAPOL/handshake counts. No LLM involved.
 - `tools/analyze_brief.py` - sends a brief to a local Ollama model and records
   the response plus timing.
-- `tools/verify_claims.py` - the reconciliation step. Checks every quantitative
-  claim in the model's analysis against the brief before the report is allowed
-  to say "verified." Handles both pcap and wardrive briefs.
+- `tools/verify_claims.py` - the reconciliation step. Checks the model's
+  quantitative claims against the deterministic brief: frame totals, AP counts,
+  probing devices, deauth counts, EAPOL totals, handshake message counts, MAC
+  citations, and (for wardrive briefs) sightings, auth mix, OUIs, and invented
+  frame-level evidence. It checks the brief, not the raw PCAP, and only the
+  fields the brief carries. A pass is necessary, not sufficient.
 - `tools/wardrive_summarize.py` - privacy-safe wardrive/GPS log summarizer
-  (no coordinates out, third-party SSIDs anonymized, MACs as OUI only).
+  (no coordinates out, all SSIDs anonymized by default, MACs as OUI only,
+  waypoints labeled A/B, never by what they are).
 - `tools/render_dashboard.py` - renders all pipeline runs to a local HTML
-  dashboard, including verification results.
+  dashboard, including reconciliation results.
 - `tools/pipeline.py` - the whole loop as one command: stream a capture,
-  summarize it, analyze it, save all artifacts to a timestamped run folder.
+  summarize it, analyze it, save all artifacts to a timestamped run folder
+  (default: ~/marauder-analyst/pipeline_runs, outside the repo tree).
 
 ## Quick start
 
@@ -58,7 +67,10 @@ python3 tools/verify_claims.py examples/example_wardrive_brief.txt \
 ```
 
 The failing example is the point: small local models invent plausible detail, and
-the reconciliation step is what catches it.
+the reconciliation step is what catches it. All examples are sanitized per
+docs/PUBLICATION_RULES.md (no third-party SSIDs, OUI-only MACs, no coordinates).
+Raw captures and the project's full capture log are NOT in this repo for the
+same reason; .gitignore keeps it that way structurally, not by convention.
 
 ## What we measured (2026-08-31 to 2026-09-02, hardware as above)
 
@@ -70,9 +82,12 @@ the reconciliation step is what catches it.
   remains the full-fidelity option there.
 - qwen3.5:0.8b analyzed a capture brief at ~7.4 tok/s and hallucinated (wrong
   deauth counts, invented topology). qwen3:4b-instruct at ~1.3 tok/s got every
-  number right. Model size is the accuracy floor for this task.
-- A 64 GB FAT32 SD card writes valid PCAPs on v1.15.1 despite the wiki's
-  documented 32 GB limit.
+  number right. Two models from two different Qwen generations is not a
+  controlled size ladder, so treat "4B is the floor" as a rule of thumb from
+  these runs, not a measured threshold.
+- This specific 64 GB FAT32 SD card wrote valid PCAPs on v1.15.1 throughout
+  testing, despite the wiki's documented 32 GB guidance. One card, one
+  firmware version: an existence proof, not a refutation of the limit.
 
 ## Legal and scope
 
