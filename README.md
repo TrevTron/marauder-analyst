@@ -39,6 +39,9 @@ URL. Fine for your own bench, nothing more.
 - `tools/pipeline.py` - the whole loop as one command: stream a capture,
   summarize it, analyze it, save all artifacts to a timestamped run folder
   (default: ~/marauder-analyst/pipeline_runs, outside the repo tree).
+- `docs/EVIDENCE_LEDGER.md` - the sanitized extract of the project's private
+  capture log: every number in the article traced to a log entry, with
+  third-party identifiers removed. The raw log stays private on purpose.
 
 ## Quick start
 
