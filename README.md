@@ -72,6 +72,18 @@ docs/PUBLICATION_RULES.md (no third-party SSIDs, OUI-only MACs, no coordinates).
 Raw captures and the project's full capture log are NOT in this repo for the
 same reason; .gitignore keeps it that way structurally, not by convention.
 
+## Tests
+
+```bash
+python3 tools/test_verify_claims.py
+```
+
+Regression suite for the verifier: the adversarial case from an external
+pre-publication review (small-magnitude frame totals, invented EAPOL and
+handshake counts, an unsupported "crackable" verdict), the shipped passing
+example, the shipped wardrive FAIL example, and a truthful-analysis guard
+against over-flagging. 14 checks, exit 0 on success.
+
 ## What we measured (2026-08-31 to 2026-09-02, hardware as above)
 
 - Live serial streaming at 115200 baud is byte-exact in a matched test: the
