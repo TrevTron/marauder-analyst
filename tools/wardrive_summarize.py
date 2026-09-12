@@ -16,7 +16,7 @@ import csv
 import json
 import math
 import sys
-import xml.etree.ElementTree as ET
+from defusedxml.ElementTree import parse as _xml_parse
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -58,7 +58,7 @@ def parse_wigle(path):
 
 
 def parse_gpx(path):
-    tree = ET.parse(path)
+    tree = _xml_parse(path)
     wpts = []
     for w in tree.getroot().iter():
         if not w.tag.endswith("wpt"):
