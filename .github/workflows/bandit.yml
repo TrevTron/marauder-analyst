@@ -1,0 +1,31 @@
+name: Bandit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bandit:
+    name: Tests and Bandit scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt bandit
+      - name: Run tests
+        run: |
+          for t in tools/test_*.py; do
+            echo "== $t"
+            python "$t"
+          done
+      - name: Scan Python tools
+        # Respects per-call `# nosec <id>  # reason` annotations in the source.
+        run: bandit -r tools/

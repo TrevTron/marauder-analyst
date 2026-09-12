@@ -1,5 +1,7 @@
 # marauder-analyst
 
+[![Bandit](https://github.com/TrevTron/marauder-analyst/actions/workflows/bandit.yml/badge.svg)](https://github.com/TrevTron/marauder-analyst/actions/workflows/bandit.yml)
+
 Turn an ESP32 Marauder into an automated WiFi capture analyst. A Marauder captures
 802.11 traffic; a small single-board computer (we use a Youyeetoo X1S, N5095, 16 GB,
 no discrete GPU, all inference CPU-only) receives the capture over the stock USB

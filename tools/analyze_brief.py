@@ -71,7 +71,7 @@ def main():
         data=json.dumps(payload).encode(),
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(req, timeout=900) as resp:
+    with urllib.request.urlopen(req, timeout=900) as resp:  # nosec B310  # fixed localhost ollama endpoint, URL is not user-controlled
         r = json.load(resp)
     print(r.get("response", ""))
     print("---")
