@@ -16,7 +16,8 @@ import csv
 import json
 import math
 import sys
-from defusedxml.ElementTree import parse as _xml_parse
+from defusedxml import DefusedXmlException
+from defusedxml.ElementTree import ParseError, parse as _xml_parse
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -57,8 +58,19 @@ def parse_wigle(path):
     return rows
 
 
+class GPXError(ValueError):
+    """A GPX file that could not be read safely."""
+
+
 def parse_gpx(path):
-    tree = _xml_parse(path)
+    # defusedxml refuses DTD entity declarations and external references, so
+    # an entity-bearing GPX is rejected here instead of being expanded.
+    try:
+        tree = _xml_parse(path)
+    except DefusedXmlException as e:
+        raise GPXError(f"{path}: rejected, GPX uses a DTD entity or external reference ({e})") from e
+    except ParseError as e:
+        raise GPXError(f"{path}: not valid XML ({e})") from e
     wpts = []
     for w in tree.getroot().iter():
         if not w.tag.endswith("wpt"):
@@ -132,7 +144,10 @@ def main():
     logs = sorted(indir.glob("wardrive_*.log"))
     gpxs = sorted(indir.glob("wardrive_poi_*.gpx"))
     runs = [parse_wigle(p) for p in logs]
-    pois = [parse_gpx(p) for p in gpxs]
+    try:
+        pois = [parse_gpx(p) for p in gpxs]
+    except GPXError as e:
+        sys.exit(f"error: {e}")
 
     all_rows = [r for run in runs for r in run]
     ssid_counter = Counter(r["ssid"] for r in all_rows if r["type"] == "WIFI")
