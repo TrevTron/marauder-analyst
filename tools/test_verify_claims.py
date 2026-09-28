@@ -16,7 +16,7 @@ Usage: python3 tools/test_verify_claims.py
 Exit 0 if all tests pass, 1 otherwise.
 """
 import os
-import subprocess
+import subprocess  # nosec B404  # subprocess used with an argv list, never shell=True
 import sys
 import tempfile
 
@@ -81,7 +81,7 @@ WARDRIVE_AUTH_ATTACK = "The auth mix includes OPEN: 2."
 
 
 def run_verifier(brief_path, analysis_path):
-    proc = subprocess.run(
+    proc = subprocess.run(  # nosec B603  # argv list, invokes the sibling verifier via sys.executable, no shell
         [sys.executable, VERIFIER, brief_path, analysis_path],
         capture_output=True, text=True,
     )

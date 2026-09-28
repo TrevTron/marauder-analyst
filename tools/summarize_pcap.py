@@ -8,7 +8,7 @@ Turns a Marauder PCAP into a compact text brief sized for a small local model
 Marauder PCAPs are linktype 105 (raw 802.11, no radiotap), so no per-frame RSSI.
 Usage: python3 summarize_pcap.py <file.pcap> [--top N]
 """
-import subprocess, sys, collections, argparse, re
+import subprocess, sys, collections, argparse, re  # nosec B404  # subprocess used with argv lists, never shell=True
 
 def decode_ssid(s):
     """tshark emits SSIDs as hex when they contain separators; decode if so."""
@@ -26,7 +26,7 @@ def tshark_fields(pcap, fields, display_filter=None):
     if display_filter:
         cmd += ["-Y", display_filter]
     cmd += ["-T", "fields"] + [f for kv in fields for f in ("-e", kv)]
-    out = subprocess.run(cmd, capture_output=True, text=True)
+    out = subprocess.run(cmd, capture_output=True, text=True)  # nosec B603  # argv list (tshark), args are program-controlled, pcap is a local path
     if out.returncode != 0:
         raise SystemExit(f"tshark failed: {out.stderr[:300]}")
     return [line.split("\t") for line in out.stdout.splitlines()]

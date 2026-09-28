@@ -218,7 +218,8 @@ def main():
     try:
         from daimon_runtime import setup_plot
         setup_plot()
-    except Exception:
+    except ImportError:
+        # optional local styling hook; absent in most environments
         pass
 
     lats = [r["lat"] for r in all_rows]

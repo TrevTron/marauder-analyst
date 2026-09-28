@@ -5,7 +5,7 @@ Runs on the X1S with the Marauder on /dev/ttyUSB0.
 Usage: python3 pipeline.py <beacon|probe|raw> <seconds> [model] [max_tokens]
 Example: python3 pipeline.py raw 60 qwen3:4b-instruct 400
 """
-import argparse, sys, os, shutil, subprocess, datetime
+import argparse, sys, os, shutil, subprocess, datetime  # nosec B404  # subprocess used with argv lists, never shell=True
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Run artifacts (raw PCAPs with third-party MACs/SSIDs) live OUTSIDE the repo
@@ -15,7 +15,7 @@ OUT = os.environ.get("PIPELINE_RUNS_DIR",
 
 def run(cmd, **kw):
     print(f"$ {' '.join(cmd)}", flush=True)
-    return subprocess.run(cmd, **kw)
+    return subprocess.run(cmd, **kw)  # nosec B603  # cmd is an internally-built argv list, no shell
 
 
 def positive_int(value):
