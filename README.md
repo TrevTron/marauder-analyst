@@ -97,6 +97,14 @@ handshake counts, an unsupported "crackable" verdict), the shipped passing
 example, the shipped wardrive FAIL example, and a truthful-analysis guard
 against over-flagging. 19 checks, exit 0 on success.
 
+```bash
+python3 tools/test_wardrive_gpx.py
+```
+
+GPX parsing checks for `wardrive_summarize.py`: a normal POI file still parses,
+entity-bearing GPX (internal or external entities) is rejected, and the CLI
+reports that as a one-line error instead of a traceback.
+
 ## What we measured (2026-08-31 to 2026-09-02, hardware as above)
 
 - Live serial streaming at 115200 baud is byte-exact in a matched test: the
